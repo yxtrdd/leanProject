@@ -1,0 +1,15 @@
+[
+	{
+	    "value":"default",
+	    "text":"默认"
+	    ,"selected":true
+    },
+    {
+	    "value":"gray",
+	    "text":"银色"
+    },
+    {
+	     "value":"metro-red",
+	    "text":"红色"
+    }
+]

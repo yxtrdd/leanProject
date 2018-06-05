@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.easyproject.easyee.sm.sys.dao.SysDictCatalogDAO">
+	<resultMap type="SysDictCatalog" id="SysDictCatalogMap">
+		<!-- mapping -->
+		<id column="ID" property="id"/>		
+		<result column="PARENT_ID" property="parentId"/>		
+		<result column="CATALOG_NAME" property="catalogName"/>		
+		<result column="SORT_NUM" property="sortNum"/>		
+		<result column="REMARK" property="remark"/>		
+	</resultMap>
+	
+	<sql id="tableName">
+		SYS_DICT_CATALOG
+	</sql>
+
+	<select id="findAll" resultMap="SysDictCatalogMap">
+		select * from <include refid="tableName" />
+	</select>
+	
+	<select id="get" resultMap="SysDictCatalogMap">
+		select * from <include refid="tableName" /> where id=#{id} or CATALOG_NAME=#{id}
+	</select>
+	
+	<insert id="save">
+		<selectKey keyColumn="id" keyProperty="id" resultType="String" order="BEFORE">
+			select sys_guid() from dual
+		</selectKey>
+		insert into <include refid="tableName" />
+		<trim prefix=" (" suffix=") " suffixOverrides=",">	<!-- suffixOverrides可以去掉多余的逗号"," -->
+			<if test="id != null">ID,</if>
+			<if test="parentId != null">PARENT_ID,</if>
+			<if test="catalogName != null">CATALOG_NAME,</if>
+			<if test="sortNum != null">SORT_NUM,</if>
+			<if test="remark != null">REMARK,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">#{id},</if>
+			<if test="parentId != null">#{parentId},</if>
+			<if test="catalogName != null">#{catalogName},</if>
+			<if test="sortNum != null">#{sortNum},</if>
+			<if test="remark != null">#{remark},</if>
+		</trim>
+	</insert>
+	
+	<insert id="update">
+		update <include refid="tableName" /> 
+		<set>	<!-- set可以将动态的配置SET关键字，和剔除追加到条件末尾的任何不相关的逗号 -->
+			<if test="parentId != null">PARENT_ID=#{parentId},</if>
+			<if test="catalogName != null">CATALOG_NAME=#{catalogName},</if>
+			<if test="sortNum != null">SORT_NUM=#{sortNum},</if>
+			<if test="remark != null">REMARK=#{remark},</if>
+		</set>
+		where id=#{id}
+	</insert>
+	
+	<delete id="delete">
+		delete from <include refid="tableName" /> where id=#{id}
+	</delete>
+	
+	<delete id="deleteByIds">
+		delete from <include refid="tableName" /> 
+		 WHERE id in
+		  <foreach item="item" index="index" collection="array"
+		      open="(" separator="," close=")">
+		       #{item}
+		  </foreach>
+	</delete>
+	
+	<select id="pagination" resultMap="SysDictCatalogMap">
+		${autoSQL}
+	</select>
+
+	<select id="findMaxRow" resultType="int">
+		select count(*) from <include refid="tableName" />
+	</select>
+	
+	<select id="getChildNext" resultMap="SysDictCatalogMap">
+		select * from <include refid="tableName" /> where PARENT_ID = #{id} order by SORT_NUM asc
+	</select>
+	
+	<select id="getChildCount" resultType="int">
+		select count(*) from <include refid="tableName" /> where PARENT_ID = #{id}
+	</select>
+</mapper>
